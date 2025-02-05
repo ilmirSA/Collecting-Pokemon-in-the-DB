@@ -18,6 +18,11 @@ class PokemonEntity(models.Model):
     lon = models.FloatField(verbose_name="Долгота")
     appeared_at = models.DateTimeField(default=datetime.datetime.now())
     disappeared_at = models.DateTimeField(default=datetime.datetime.now())
+    level = models.IntegerField(default=1)
+    hp = models.IntegerField(default=100)
+    attack = models.IntegerField(default=5)
+    protection = models.IntegerField(default=3)
+    endurance = models.IntegerField(default=2)
 
     def __str__(self):
         return f' Покемон: {self.pokemon.title} Широта: {self.lat} Долгота: {self.lon}'
