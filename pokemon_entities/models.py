@@ -1,3 +1,5 @@
+import datetime
+
 from django.db import models  # noqa F401
 
 
@@ -14,6 +16,8 @@ class PokemonEntity(models.Model):
     pokemon = models.ForeignKey(Pokemon, on_delete=models.CASCADE)
     lat = models.FloatField(verbose_name="Широта")
     lon = models.FloatField(verbose_name="Долгота")
+    appeared_at = models.DateTimeField(default=datetime.datetime.now())
+    disappeared_at = models.DateTimeField(default=datetime.datetime.now())
 
     def __str__(self):
         return f' Покемон: {self.pokemon.title} Широта: {self.lat} Долгота: {self.lon}'
