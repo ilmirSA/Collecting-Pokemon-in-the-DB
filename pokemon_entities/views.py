@@ -72,6 +72,15 @@ def show_pokemon(request, pokemon_id):
             pokemon_all["title_jp"] = pokemon.pokemon.title_jp
             pokemon_all["description"] = pokemon.pokemon.description
 
+            if pokemon.pokemon.previous_evolution:
+                avatar = pokemon.pokemon.previous_evolution.avatar
+                image_url = request.build_absolute_uri(f"{settings.MEDIA_URL}{avatar}")
+                pokemon_all["previous_evolution"] = {
+                    "title_ru": pokemon.pokemon.previous_evolution.title,
+                    "pokemon_id": pokemon.pokemon.id,
+                    "img_url": image_url,
+                }
+
             add_pokemon(
                 folium_map, pokemon.lat,
                 pokemon.lon,
@@ -81,6 +90,8 @@ def show_pokemon(request, pokemon_id):
             break
         else:
             return HttpResponseNotFound('<h1>Такой покемон не найден</h1>')
+
+    print(pokemons)
 
     return render(request, 'pokemon.html', context={
         'map': folium_map._repr_html_(), 'pokemon': pokemon_all
