@@ -4,7 +4,7 @@ from django.shortcuts import render
 from django.utils.timezone import localtime
 
 from pogomap import settings
-from pokemon_entities.models import PokemonEntity
+from pokemon_entities.models import PokemonEntity,Pokemon
 
 MOSCOW_CENTER = [55.751244, 37.618423]
 DEFAULT_IMAGE_URL = (
@@ -56,8 +56,7 @@ def show_all_pokemons(request):
 
 def show_pokemon(request, pokemon_id):
     pokemon_all = {}
-    pokemon = PokemonEntity.objects.filter(pokemon__id=pokemon_id).first()
-
+    pokemon = PokemonEntity.objects.get(pokemon__id=pokemon_id)
     folium_map = folium.Map(location=MOSCOW_CENTER, zoom_start=12)
 
     if pokemon.pokemon.id == int(pokemon_id):
