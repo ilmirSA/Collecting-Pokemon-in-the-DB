@@ -4,7 +4,7 @@ from django.shortcuts import render
 from django.utils.timezone import localtime
 
 from pogomap import settings
-from pokemon_entities.models import PokemonEntity,Pokemon
+from pokemon_entities.models import PokemonEntity, Pokemon
 
 MOSCOW_CENTER = [55.751244, 37.618423]
 DEFAULT_IMAGE_URL = (
@@ -56,44 +56,44 @@ def show_all_pokemons(request):
 
 def show_pokemon(request, pokemon_id):
     pokemon_all = {}
-    pokemon = PokemonEntity.objects.get(pokemon__id=pokemon_id)
+    try:
+        pokemon = PokemonEntity.objects.get(pokemon__id=pokemon_id)
+    except (PokemonEntity.DoesNotExist):
+        return HttpResponseNotFound('<h1>Pokemon not found</h1>')
     folium_map = folium.Map(location=MOSCOW_CENTER, zoom_start=12)
 
-    if pokemon.pokemon.id == int(pokemon_id):
-        image_url = request.build_absolute_uri(f"{settings.MEDIA_URL}{pokemon.pokemon.avatar}")
+    image_url = request.build_absolute_uri(f"{settings.MEDIA_URL}{pokemon.pokemon.avatar}")
 
-        pokemon_all["pokemon_id"] = pokemon.pokemon.id
-        pokemon_all["title_ru"] = pokemon.pokemon.title
-        pokemon_all["img_url"] = image_url
-        pokemon_all["title_en"] = pokemon.pokemon.title_en
-        pokemon_all["title_jp"] = pokemon.pokemon.title_jp
-        pokemon_all["description"] = pokemon.pokemon.description
+    pokemon_all["pokemon_id"] = pokemon.pokemon.id
+    pokemon_all["title_ru"] = pokemon.pokemon.title
+    pokemon_all["img_url"] = image_url
+    pokemon_all["title_en"] = pokemon.pokemon.title_en
+    pokemon_all["title_jp"] = pokemon.pokemon.title_jp
+    pokemon_all["description"] = pokemon.pokemon.description
 
-        if pokemon.pokemon.previous_evolution:
-            avatar = pokemon.pokemon.previous_evolution.avatar
-            image_url = request.build_absolute_uri(f"{settings.MEDIA_URL}{avatar}")
-            pokemon_all["previous_evolution"] = {
-                "title_ru": pokemon.pokemon.previous_evolution.title,
-                "pokemon_id": pokemon.pokemon.id,
-                "img_url": image_url,
-            }
+    if pokemon.pokemon.previous_evolution:
+        avatar = pokemon.pokemon.previous_evolution.avatar
+        image_url = request.build_absolute_uri(f"{settings.MEDIA_URL}{avatar}")
+        pokemon_all["previous_evolution"] = {
+            "title_ru": pokemon.pokemon.previous_evolution.title,
+            "pokemon_id": pokemon.pokemon.previous_evolution.id,
+            "img_url": image_url,
+        }
 
-        if next_evolutions := pokemon.pokemon.next_evolutions.first():
-            avatar = next_evolutions.avatar
-            image_url = request.build_absolute_uri(f"{settings.MEDIA_URL}{avatar}")
-            pokemon_all["next_evolution"] = {
-                "title_ru": next_evolutions.title,
-                "pokemon_id": next_evolutions.id,
-                "img_url": image_url,
-            }
+    if next_evolutions := pokemon.pokemon.next_evolutions.first():
+        avatar = next_evolutions.avatar
+        image_url = request.build_absolute_uri(f"{settings.MEDIA_URL}{avatar}")
+        pokemon_all["next_evolution"] = {
+            "title_ru": next_evolutions.title,
+            "pokemon_id": next_evolutions.id,
+            "img_url": image_url,
+        }
 
-        add_pokemon(
-            folium_map, pokemon.lat,
-            pokemon.lon,
-            image_url
-            )
-    else:
-        return HttpResponseNotFound('<h1>Такой покемон не найден</h1>')
+    add_pokemon(
+        folium_map, pokemon.lat,
+        pokemon.lon,
+        image_url
+    )
 
     return render(request, 'pokemon.html', context={
         'map': folium_map._repr_html_(), 'pokemon': pokemon_all

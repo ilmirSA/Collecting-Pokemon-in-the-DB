@@ -3,6 +3,7 @@ import datetime
 from django.db import models  # noqa F401
 from django.utils import timezone
 
+
 class Pokemon(models.Model):
     title = models.CharField(verbose_name="Имя покемона",max_length=200)
     title_en = models.CharField(verbose_name="Имя покемона на английском", max_length=200, blank=True)
